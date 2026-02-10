@@ -1,0 +1,212 @@
+[cloudera@quickstart ~]$ spark-shell
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel).
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /___/ .__/\_,_/_/ /_/\_\   version 1.6.0
+      /_/
+
+Using Scala version 2.10.5 (Java HotSpot(TM) 64-Bit Server VM, Java 1.7.0_67)
+Type in expressions to have them evaluated.
+Type :help for more information.
+26/02/09 15:40:30 WARN hdfs.DFSClient: Caught exception 
+java.lang.InterruptedException
+	at java.lang.Object.wait(Native Method)
+	at java.lang.Thread.join(Thread.java:1281)
+	at java.lang.Thread.join(Thread.java:1355)
+	at org.apache.hadoop.hdfs.DFSOutputStream$DataStreamer.closeResponder(DFSOutputStream.java:967)
+	at org.apache.hadoop.hdfs.DFSOutputStream$DataStreamer.endBlock(DFSOutputStream.java:705)
+	at org.apache.hadoop.hdfs.DFSOutputStream$DataStreamer.run(DFSOutputStream.java:894)
+Spark context available as sc (master = yarn-client, app id = application_1770680213786_0001).
+26/02/09 15:40:53 WARN metastore.ObjectStore: Version information not found in metastore. hive.metastore.schema.verification is not enabled so recording the schema version 1.1.0-cdh5.13.0
+26/02/09 15:40:53 WARN metastore.ObjectStore: Failed to get database default, returning NoSuchObjectException
+SQL context available as sqlContext.
+
+scala> import org.apache.spark.sql.hive.HiveContext
+import org.apache.spark.sql.hive.HiveContext
+
+scala> val sqlContext = new HiveContext(sc)
+sqlContext: org.apache.spark.sql.hive.HiveContext = org.apache.spark.sql.hive.HiveContext@5fb17398
+
+scala> sqlContext.sql("show databases").show()
++--------+
+|  result|
++--------+
+| default|
+|enron_db|
+|  job_db|
++--------+
+
+
+scala> sqlContext.sql("use job_db")
+res1: org.apache.spark.sql.DataFrame = [result: string]
+
+scala> sqlContext.sql("show tables").show()
++---------+-----------+
+|tableName|isTemporary|
++---------+-----------+
+|     jobs|      false|
++---------+-----------+
+
+
+scala> sqlContext.sql("select count(*) from jobs").show()
++-------+                                                                       
+|    _c0|
++-------+
+|1615941|
++-------+
+
+
+scala> sqlContext.sql("select Job_Title, Country from jobs limit 10").show()
++--------------------+--------------------+
+|           Job_Title|             Country|
++--------------------+--------------------+
+|           Job Title|             Country|
+|Digital Marketing...|         Isle of Man|
+|       Web Developer|        Turkmenistan|
+|          9687619505|          "Macao SAR|
+|    Network Engineer|               Benin|
+|       Event Manager|               Chile|
+|     Software Tester|             Belgium|
+|             Teacher|      Cayman Islands|
+|      UX/UI Designer|Sao Tome and Prin...|
+|      UX/UI Designer|            Maldives|
++--------------------+--------------------+
+
+
+scala> sqlContext.sql("""
+     | select Country, count(*) as total
+     | from jobs
+     | group by Country
+     | order by total desc
+     | limit 10
+     | """).show()
++------------+-----+                                                            
+|     Country|total|
++------------+-----+
+|       Malta| 7723|
+|  "Venezuela| 7694|
+|     Somalia| 7689|
+|Sierra Leone| 7656|
+|   Sri Lanka| 7649|
+|     Vietnam| 7649|
+|  Azerbaijan| 7643|
+|  San Marino| 7638|
+|Turkmenistan| 7633|
+|      Rwanda| 7630|
++------------+-----+
+
+
+scala> sqlContext.sql("""
+     | select Work_Type, count(*) as total
+     | from jobs
+     | group by Work_Type
+     | order by total desc
+     | """).show()
++---------+------+                                                              
+|Work_Type| total|
++---------+------+
+|Part-Time|307726|
+| Contract|306841|
+|Temporary|306788|
+|   Intern|306754|
+|Full-Time|305921|
+| -66.5897|  7694|
+|   53.688|  7543|
+| 114.1095|  7494|
+| 127.7669|  7486|
+|  10.2679|  7462|
+| -95.7129|  7431|
+| 150.5508|  7405|
+| 113.5439|  7384|
+|  21.7453|  7350|
+| 145.6739|  7340|
+| -77.3963|  7321|
+|Work Type|     1|
++---------+------+
+
+
+scala> sqlContext.sql("""
+     | select Role, count(*) as total
+     | from jobs
+     | group by Role
+     | order by total desc
+     | limit 20
+     | """).show()
++--------------------+-----+                                                    
+|                Role|total|
++--------------------+-----+
+|Interaction Designer|19552|
+|Network Administr...|17427|
+|Social Media Manager|14109|
+|User Interface De...|13303|
+|User Experience D...|13205|
+| Procurement Analyst|13080|
+| Executive Assistant|10991|
+| Procurement Manager|10898|
+|        Data Analyst|10710|
+|Quality Assurance...|10532|
+|Customer Success ...|10530|
+|      SEO Specialist|10496|
+|Database Administ...|10437|
+|      Office Manager|10369|
+|Social Media Analyst|10135|
+|   Backend Developer| 9860|
+|      Demand Planner| 9852|
+|  Frontend Developer| 9819|
+|  Retirement Planner| 9771|
+|      UX/UI Designer| 9164|
++--------------------+-----+
+
+
+scala> sqlContext.sql("""
+     | select Company, count(*) as total
+     | from jobs
+     | group by Company
+     | order by total desc
+     | limit 10
+     | """).show()
++--------------------+------+                                                   
+|             Company| total|
++--------------------+------+
+| Stock Options or...|136608|
+| Relocation Assis...| 83506|
+| Bonuses and Ince...| 83200|
+| Paid Time Off (PTO)| 75940|
+| Professional Dev...| 68670|
+| Tuition Reimburs...| 68640|
+|    Retirement Plans| 68429|
+| Financial Counse...| 68428|
+| Social and Recre...| 68341|
+| Flexible Work Ar...| 34861|
++--------------------+------+
+
+
+scala> sqlContext.sql("""
+     | select Salary_Range, count(*) as total
+     | from jobs
+     | group by Salary_Range
+     | order by total desc
+     | limit 10
+     | """).show()
++------------+-----+                                                            
+|Salary_Range|total|
++------------+-----+
+|   $59K-$88K| 3043|
+|  $58K-$101K| 3038|
+|   $62K-$82K| 3033|
+|  $61K-$106K| 3025|
+|  $61K-$112K| 3015|
+|   $64K-$83K| 3003|
+|  $62K-$107K| 3003|
+|  $64K-$120K| 3003|
+|   $62K-$84K| 3000|
+|  $65K-$125K| 2996|
++------------+-----+
+
+
+scala> :quit
+Stopping spark context.
+[cloudera@quickstart ~]$ 

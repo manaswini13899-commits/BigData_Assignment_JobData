@@ -1,0 +1,110 @@
+[cloudera@quickstart ~]$ pwd
+/home/cloudera
+[cloudera@quickstart ~]$ ls -ps
+total 320
+ 4 assignment/                 52 express-deployment.json   4 Pictures/
+ 4 bdg02/                       4 jobs.csv/                 4 Public/
+ 8 cloudera-manager             4 jobs_output/              4 reducer.py
+12 cm_api.py                    8 kerberos                 12 spark-shell
+ 4 derby.log                    4 lib/                     12 spark-shell~
+ 4 Desktop/                     4 mapper.py                32 spark-shell.pdf*
+ 4 Documents/                   4 mapreduce_result/         4 Templates/
+ 4 Downloads/                  20 map reducing              4 Videos/
+ 4 eclipse/                    20 map reducing~             4 workspace/
+ 4 emails.csv/                  4 Music/
+56 enterprise-deployment.json   8 parcels
+[cloudera@quickstart ~]$ sudo -u hdfs hdfs dfsadmin -safemode leave
+Safe mode is OFF
+[cloudera@quickstart ~]$ hdfs dfs -put /home/cloudera/jobs.csv/job_descriptions.csv /user/cloudera/jobs
+put: `/user/cloudera/jobs/job_descriptions.csv': File exists
+[cloudera@quickstart ~]$ hdfs dfs -ls /user/cloudera/jobs
+Found 1 items
+-rw-r--r--   1 cloudera cloudera 1743166140 2026-02-07 17:01 /user/cloudera/jobs/job_descriptions.csv
+[cloudera@quickstart ~]$ hive
+
+Logging initialized using configuration in jar:file:/usr/lib/hive/lib/hive-common-1.1.0-cdh5.13.0.jar!/hive-log4j.properties
+WARNING: Hive CLI is deprecated and migration to Beeline is recommended.
+hive> CREATE DATABASE job_db;
+FAILED: Execution Error, return code 1 from org.apache.hadoop.hive.ql.exec.DDLTask. Database job_db already exists
+hive> USE job_db;
+OK
+Time taken: 0.025 seconds
+hive> CREATE EXTERNAL TABLE jobs (
+    > Job_Id STRING,
+    > Experience STRING,
+    > Qualifications STRING,
+    > Salary_Range STRING,
+    > location STRING,
+    > Country STRING,
+    > latitude STRING,
+    > longitude STRING,
+    > Work_Type STRING,
+    > Company_Size STRING,
+    > Job_Posting_Date STRING,
+    > Preference STRING,
+    > Contact_Person STRING,
+    > Contact STRING,
+    > Job_Title STRING,
+    > Role STRING,
+    > Job_Portal STRING,
+    > Job_Description STRING,
+    > Benefits STRING,
+    > skills STRING,
+    > Responsibilities STRING,
+    > Company STRING,
+    > Company_Profile STRING
+    > )
+    > ROW FORMAT DELIMITED
+    > FIELDS TERMINATED BY ','
+    > STORED AS TEXTFILE
+    > LOCATION '/user/cloudera/jobs'
+    > TBLPROPERTIES ("skip.header.line.count"="1");
+FAILED: Execution Error, return code 1 from org.apache.hadoop.hive.ql.exec.DDLTask. AlreadyExistsException(message:Table jobs already exists)
+hive> USE job_db;
+OK
+Time taken: 0.015 seconds
+hive> SELECT COUNT(*) FROM jobs;
+Query ID = cloudera_20260209093030_a9e14e12-912f-44fb-a709-dfe25dabe928
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks determined at compile time: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1770654430727_0004, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1770654430727_0004/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1770654430727_0004
+Hadoop job information for Stage-1: number of mappers: 7; number of reducers: 1
+2026-02-09 09:30:12,057 Stage-1 map = 0%,  reduce = 0%
+2026-02-09 09:30:28,736 Stage-1 map = 29%,  reduce = 0%, Cumulative CPU 2.92 sec
+2026-02-09 09:30:42,182 Stage-1 map = 57%,  reduce = 0%, Cumulative CPU 5.83 sec
+2026-02-09 09:30:56,548 Stage-1 map = 86%,  reduce = 0%, Cumulative CPU 8.69 sec
+2026-02-09 09:31:07,447 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 9.8 sec
+2026-02-09 09:31:08,481 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 10.66 sec
+MapReduce Total cumulative CPU time: 10 seconds 660 msec
+Ended Job = job_1770654430727_0004
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 7  Reduce: 1   Cumulative CPU: 10.66 sec   HDFS Read: 1743996282 HDFS Write: 8 SUCCESS
+Total MapReduce CPU Time Spent: 10 seconds 660 msec
+OK
+1615940
+Time taken: 67.486 seconds, Fetched: 1 row(s)
+hive> SELECT * FROM jobs LIMIT 10;
+OK
+1089843540111562	5 to 15 Years	M.Tech	$59K-$99K	Douglas	Isle of Man	54.2361	-4.5481	Intern	26801	2022-04-24	Female	Brandon Cunningham	001-381-930-7517x737	Digital Marketing Specialist	Social Media Manager	Snagajob	"Social Media Managers oversee an organizations social media presence. They create and schedule content	 engage with followers	 and analyze social media metrics to drive brand awareness and engagement."	"{'Flexible Spending Accounts (FSAs)	 Relocation Assistance	 Legal Assistance
+398454096642776	2 to 12 Years	BCA	$56K-$116K	Ashgabat	Turkmenistan	38.9697	59.5563	Intern	100340	2022-12-19	Female	Francisco Larsen	461-509-4216	Web Developer	Frontend Web Developer	Idealist	"Frontend Web Developers design and implement user interfaces for websites	 ensuring they are visually appealing and user-friendly. They collaborate with designers and backend developers to create seamless web experiences for users."	"{'Health Insurance	 Retirement Plans	 Paid Time Off (PTO)	 Flexible Work Arrangements
+481640072963533	0 to 12 Years	PhD	$61K-$104K	Macao	"Macao SAR	 China"	22.1987	113.5439	Temporary	84525	2022-09-14	Male	Gary Gibson	9687619505	Operations Manager	Quality Control Manager	Jobs2Careers"Quality Control Managers establish and enforce quality standards within an organization. They develop quality control processes	 perform inspections	 and implement corrective actions to maintain product or service quality."	"{'Legal Assistance	 Bonuses and Incentive Programs
+688192671473044	4 to 11 Years	PhD	$65K-$91K	Porto-Novo	Benin	9.3077	2.3158	Full-Time	129896	2023-02-25	Female	Joy Lucero	+1-820-643-5431x47576	Network Engineer	Wireless Network Engineer	FlexJobs	"Wireless Network Engineers design	 implement	 and maintain wireless network solutions. They optimize wireless connectivity	 troubleshoot issues	 and ensure reliable and secure wireless communications."	"{'Transportation Benefits
+117057806156508	1 to 12 Years	MBA	$64K-$87K	Santiago	Chile	-35.6751	-71.5429	Intern	539442022-10-11	Female	Julie Johnson	343.975.4702x9340	Event Manager	Conference Manager	Jobs2Careers	"A Conference Manager coordinates and manages conferences	 meetings	 and events. They plan logistics	 handle budgeting	 liaise with vendors	 and ensure the smooth execution of events
+116831420231957	4 to 12 Years	MCA	$59K-$93K	Brussels	Belgium	50.5039	4.4699	Full-Time	23196	2023-07-25	Male	Matthew Gill	(973)791-5355x52199	Software Tester	Quality Assurance Analyst	Snagajob	"A Quality Assurance Analyst tests software and products to ensure they meet quality standards. They identify defects	 report issues	 and work with development teams to resolve problems."	"{'Life and Disability Insurance	 Stock Options or Equity Grants	 Employee Recognition Programs
+1292168246729889	3 to 15 Years	PhD	$63K-$103K	George Town	Cayman Islands	19.3133	-81.2546	Temporary	26119	2023-04-10	Both	Zachary Hansen	001-268-510-4362x789	Teacher	Classroom Teacher	FlexJobs	"A Classroom Teacher educates students in a specific subject or grade level. They create lesson plans	 deliver instruction assess student progress	 and foster a positive learning environment."	"{'Flexible Spending Accounts (FSAs)	 Relocation Assistance
+1498778686197107	2 to 8 Years	M.Com	$65K-$102K	SÃ£o TomÃ©	Sao Tome and Principe	0.1864	6.6131	Contract	40558	2022-09-20	Female	Chad Strickland	667.202.6824x15893	UX/UI Designer	User Interface Designer	Indeed	"User Interface Designers focus on the visual and interactive aspects of digital interfaces. They design layouts	 buttons	 and other elements to ensure a cohesive and visually appealing user interface."	"{'Employee Assistance Programs (EAP)	 Tuition Reimbursement	 Profit-Sharing
+1680293940995740	2 to 9 Years	BBA	$65K-$102K	Male	Maldives	3.2028	73.2207	Temporary	105343	2022-02-19	Female	David Hanson	+1-337-946-9956x550	UX/UI Designer	Interaction Designer	Indeed	Interaction Designers specialize in designing user interactions within digital interfaces. They create meaningful and engaging user experiences by considering user behaviors and system responses.	"{'Transportation Benefits	 Professional Development	 Bonuses and Incentive Programs	 Profit-Sharing	 Employee Discounts'}"
+255627812588102	1 to 10 Years	BBA	$60K-$80K	Saint John's	Antigua and Barbuda	17.0608	-61.7964	Full-Time	102069	2022-05-13	Both	John Nguyen	001-318-990-0531x978	Wedding Planner	Wedding Consultant	Stack Overflow Jobs	"A Wedding Consultant assists couples in planning and coordinating their weddings	 helping them with vendor selection	 budget management	 and ensuring a seamless wedding day experience."	"{'Legal Assistance	 Bonuses and Incentive Programs
+Time taken: 0.09 seconds, Fetched: 10 row(s)
+hive> exit;
+WARN: The method class org.apache.commons.logging.impl.SLF4JLogFactory#release() was invoked.
+WARN: Please see http://www.slf4j.org/codes.html#release for an explanation.
+[cloudera@quickstart ~]$ 
